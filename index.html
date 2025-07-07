@@ -4,347 +4,25 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Prona Sur - Sistema de Inventario</title>
-  <style> 
-   <script>
-/* ------------------------- Estado y LocalStorage ------------------------- */
-let productos = JSON.parse(localStorage.getItem("productos")) || [];
-let rutas = JSON.parse(localStorage.getItem("rutas")) || [];
-let ventas = JSON.parse(localStorage.getItem("ventas")) || [];
-
-function guardarEstado() {
-  localStorage.setItem("productos", JSON.stringify(productos));
-  localStorage.setItem("rutas", JSON.stringify(rutas));
-  localStorage.setItem("ventas", JSON.stringify(ventas));
-}
-
-/* ------------------------- Navegación ------------------------- */
-document.querySelectorAll('.nav-link').forEach(link => {
-  link.addEventListener('click', () => {
-    document.querySelectorAll('.nav-link').forEach(l => l.classList.remove('active'));
-    link.classList.add('active');
-
-    document.querySelectorAll('main section').forEach(sec => sec.classList.add('hidden'));
-    document.getElementById(link.dataset.section + 'Section').classList.remove('hidden');
-
-    if(link.dataset.section === "inventario") renderInventario();
-    if(link.dataset.section === "rutas") renderRutas();
-    if(link.dataset.section === "ventas") renderVentas();
-    if(link.dataset.section === "gestionar") renderGestionar();
-  });
-});
-
-/* ------------------------- Inventario ------------------------- */
-const searchInput = document.getElementById("searchInput");
-searchInput.addEventListener("input", renderInventario);
-
-function renderInventario() {
-  const filtro = searchInput.value.toLowerCase();
-  const filtrados = productos.filter(p => p.nombre.toLowerCase().includes(filtro));
-
-  const totalRefs = filtrados.length;
-  const totalCost = filtrados.reduce((sum, p) => sum + p.costo * p.cantidad, 0);
-
-  document.getElementById("totalRefs").textContent = totalRefs;
-  document.getElementById("totalCost").textContent = totalCost.toLocaleString();
-
-  const table = document.getElementById("inventarioTable");
-  table.innerHTML = `
-    <thead>
-      <tr>
-        <th>Producto</th>
-        <th>Costo</th>
-        <th>Precio</th>
-        <th>Cantidad</th>
-        <th>Ganancia</th>
-        <th>En Rutas</th>
-      </tr>
-    </thead>
-    <tbody>
-      ${filtrados.map(p => `
-        <tr>
-          <td>${p.nombre}</td>
-          <td>$${p.costo.toLocaleString()}</td>
-          <td>$${p.precio.toLocaleString()}</td>
-          <td>${p.cantidad}</td>
-          <td>$${p.ganancia.toLocaleString()}</td>
-          <td>${p.enRutas}</td>
-        </tr>
-      `).join('')}
-    </tbody>`;
-}
-
-/* ------------------------- Rutas ------------------------- */
-function renderRutas() {
-  const rutaSelect = document.getElementById("rutaSelect");
-  rutaSelect.innerHTML = "";
-  rutas.forEach((r, i) => rutaSelect.innerHTML += `<option value="${i}">${r.nombre}</option>`);
-  if (!rutas.length) {
-    rutas.push({ nombre: "Ruta 1", salidas: [] });
-    rutas.push({ nombre: "Ruta 2", salidas: [] });
-    guardarEstado();
-  }
-
-  const productoRutaSelect = document.getElementById("productoRutaSelect");
-  productoRutaSelect.innerHTML = productos.map((p, i) => `<option value="${i}">${p.nombre}</option>`).join('');
-
-  renderRutasTable();
-}
-
-function renderRutasTable() {
-  const rutasTable = document.getElementById("rutasTable");
-  rutasTable.innerHTML = `
-    <thead>
-      <tr>
-        <th>Ruta</th>
-        <th>Producto</th>
-        <th>Cantidad</th>
-        <th>Fecha</th>
-      </tr>
-    </thead>
-    <tbody>
-      ${rutas.flatMap((r, i) =>
-        r.salidas.map(s => `
-          <tr>
-            <td>${r.nombre}</td>
-            <td>${s.producto}</td>
-            <td>${s.cantidad}</td>
-            <td>${s.fecha}</td>
-          </tr>
-        `)
-      ).join('')}
-    </tbody>`;
-}
-
-document.getElementById("asignarRutaBtn").addEventListener("click", () => {
-  const rutaIndex = document.getElementById("rutaSelect").value;
-  const prodIndex = document.getElementById("productoRutaSelect").value;
-  const cantidad = parseInt(document.getElementById("cantidadRutaInput").value);
-
-  if (cantidad > 0 && productos[prodIndex].cantidad >= cantidad) {
-    productos[prodIndex].cantidad -= cantidad;
-    productos[prodIndex].enRutas += cantidad;
-    const now = new Date();
-    const fecha = now.toLocaleString();
-
-    rutas[rutaIndex].salidas.push({ producto: productos[prodIndex].nombre, cantidad, fecha });
-    ventas.push({ producto: productos[prodIndex].nombre, cantidad, fecha });
-
-    guardarEstado();
-    renderInventario();
-    renderRutas();
-    renderVentas();
-    document.getElementById("cantidadRutaInput").value = "";
-  } else {
-    alert("Cantidad inválida o stock insuficiente");
-  }
-});
-
-/* ------------------------- Ventas ------------------------- */
-function renderVentas() {
-  const ventasTable = document.getElementById("ventasTable");
-  ventasTable.innerHTML = `
-    <thead>
-      <tr>
-        <th>Producto</th>
-        <th>Cantidad</th>
-        <th>Fecha</th>
-      </tr>
-    </thead>
-    <tbody>
-      ${ventas.map(v => `
-        <tr>
-          <td>${v.producto}</td>
-          <td>${v.cantidad}</td>
-          <td>${v.fecha}</td>
-        </tr>
-      `).join('')}
-    </tbody>`;
-}
-
-/* ------------------------- Gestionar Inventario ------------------------- */
-const gestionAccionSelect = document.getElementById("gestionAccionSelect");
-gestionAccionSelect.addEventListener("change", renderGestionar);
-
-function renderGestionar() {
-  const area = document.getElementById("gestionForm");
-  const accion = gestionAccionSelect.value;
-  if (accion === "agregar") {
-    area.innerHTML = `
-      <div class="form-section">
-        <label>Nombre:</label><input id="nuevoNombre">
-        <label>Costo:</label><input type="number" id="nuevoCosto">
-        <label>Precio:</label><input type="number" id="nuevoPrecio">
-        <label>Cantidad:</label><input type="number" id="nuevaCantidad">
-        <label>Ganancia:</label><input type="number" id="nuevaGanancia">
-        <button id="guardarNuevoBtn">Agregar Producto</button>
-      </div>`;
-    document.getElementById("guardarNuevoBtn").addEventListener("click", () => {
-      productos.push({
-        nombre: document.getElementById("nuevoNombre").value,
-        costo: parseInt(document.getElementById("nuevoCosto").value),
-        precio: parseInt(document.getElementById("nuevoPrecio").value),
-        cantidad: parseInt(document.getElementById("nuevaCantidad").value),
-        ganancia: parseInt(document.getElementById("nuevaGanancia").value),
-        enRutas: 0
-      });
-      guardarEstado();
-      renderInventario();
-      alert("Producto agregado!");
-    });
-  } 
-  else if (accion === "eliminar") {
-    area.innerHTML = `
-      <div class="form-section">
-        <label>Selecciona producto a eliminar:</label>
-        <select id="eliminarSelect">
-          ${productos.map((p,i) => `<option value="${i}">${p.nombre}</option>`).join('')}
-        </select>
-        <button id="eliminarBtn">Eliminar</button>
-      </div>`;
-    document.getElementById("eliminarBtn").addEventListener("click", () => {
-      const index = document.getElementById("eliminarSelect").value;
-      productos.splice(index,1);
-      guardarEstado();
-      renderInventario();
-      renderGestionar();
-      alert("Producto eliminado!");
-    });
-  } 
-  else if (accion === "ver") {
-    area.innerHTML = `
-      <div class="stats">Haz clic en un campo para editar</div>
-      <table>
-        <thead>
-          <tr>
-            <th>Nombre</th><th>Costo</th><th>Precio</th><th>Cantidad</th><th>Ganancia</th>
-          </tr>
-        </thead>
-        <tbody>
-          ${productos.map((p,i) => `
-            <tr>
-              <td contenteditable="true" onblur="editarCampo(${i}, 'nombre', this.textContent)">${p.nombre}</td>
-              <td contenteditable="true" onblur="editarCampo(${i}, 'costo', this.textContent)">${p.costo}</td>
-              <td contenteditable="true" onblur="editarCampo(${i}, 'precio', this.textContent)">${p.precio}</td>
-              <td contenteditable="true" onblur="editarCampo(${i}, 'cantidad', this.textContent)">${p.cantidad}</td>
-              <td contenteditable="true" onblur="editarCampo(${i}, 'ganancia', this.textContent)">${p.ganancia}</td>
-            </tr>
-          `).join('')}
-        </tbody>
-      </table>`;
-  }
-}
-
-function editarCampo(index, campo, valor) {
-  if (campo === "costo" || campo === "precio" || campo === "cantidad" || campo === "ganancia") {
-    productos[index][campo] = parseInt(valor) || 0;
-  } else {
-    productos[index][campo] = valor;
-  }
-  guardarEstado();
-  renderInventario();
-}
-
-/* ------------------------- Inicial ------------------------- */
-renderInventario();
-</script>
-</body>
-</html>
-    body {
-      margin: 0;
-      font-family: Arial, sans-serif;
-      background-color: #f4f4f4;
-    }
-    .container {
-      display: flex;
-      min-height: 100vh;
-    }
-    aside {
-      width: 220px;
-      background-color: #2e7d32;
-      color: white;
-      padding: 20px;
-      box-sizing: border-box;
-    }
-    aside h1 {
-      font-size: 22px;
-      margin-bottom: 30px;
-      text-align: center;
-    }
-    aside nav a {
-      display: block;
-      color: white;
-      padding: 10px;
-      text-decoration: none;
-      border-radius: 4px;
-      margin-bottom: 8px;
-      cursor: pointer;
-    }
-    aside nav a:hover, aside nav a.active {
-      background-color: #27642b;
-    }
-    main {
-      flex: 1;
-      padding: 20px;
-      background-color: #e8f5e9;
-      box-sizing: border-box;
-      overflow-y: auto;
-    }
-    header {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      margin-bottom: 20px;
-    }
-    header h2 {
-      margin: 0;
-      color: #1b5e20;
-    }
-    button {
-      background-color: #66bb6a;
-      color: white;
-      border: none;
-      padding: 8px 16px;
-      margin: 4px;
-      border-radius: 4px;
-      cursor: pointer;
-    }
-    button:hover {
-      background-color: #57a05b;
-    }
-    input, select {
-      padding: 6px;
-      border-radius: 4px;
-      border: 1px solid #ccc;
-      margin: 4px;
-    }
-    table {
-      width: 100%;
-      border-collapse: collapse;
-      background-color: white;
-      margin-top: 10px;
-    }
-    th, td {
-      border: 1px solid #ccc;
-      padding: 8px;
-      text-align: center;
-    }
-    th {
-      background-color: #c8e6c9;
-    }
-    .hidden {
-      display: none;
-    }
-    .form-section {
-      background-color: white;
-      padding: 10px;
-      border-radius: 6px;
-      margin-bottom: 10px;
-    }
-    .stats {
-      margin: 10px 0;
-      font-weight: bold;
-      color: #1b5e20;
-    }
+  <style>
+    body { margin: 0; font-family: Arial, sans-serif; background-color: #f4f4f4;}
+    .container { display: flex; min-height: 100vh; }
+    aside { width: 220px; background-color: #2e7d32; color: white; padding: 20px; box-sizing: border-box;}
+    aside h1 { font-size: 22px; margin-bottom: 30px; text-align: center; }
+    aside nav a { display: block; color: white; padding: 10px; text-decoration: none; border-radius: 4px; margin-bottom: 8px; cursor: pointer;}
+    aside nav a:hover, aside nav a.active { background-color: #27642b; }
+    main { flex: 1; padding: 20px; background-color: #e8f5e9; box-sizing: border-box; overflow-y: auto;}
+    header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;}
+    header h2 { margin: 0; color: #1b5e20; }
+    button { background-color: #66bb6a; color: white; border: none; padding: 8px 16px; margin: 4px; border-radius: 4px; cursor: pointer;}
+    button:hover { background-color: #57a05b; }
+    input, select { padding: 6px; border-radius: 4px; border: 1px solid #ccc; margin: 4px;}
+    table { width: 100%; border-collapse: collapse; background-color: white; margin-top: 10px;}
+    th, td { border: 1px solid #ccc; padding: 8px; text-align: center;}
+    th { background-color: #c8e6c9; }
+    .hidden { display: none; }
+    .form-section { background-color: white; padding: 10px; border-radius: 6px; margin-bottom: 10px;}
+    .stats { margin: 10px 0; font-weight: bold; color: #1b5e20; }
   </style>
 </head>
 <body>
@@ -359,7 +37,6 @@ renderInventario();
       </nav>
     </aside>
     <main>
-      <!-- Inventario -->
       <section id="inventarioSection">
         <header>
           <h2>Inventario</h2>
@@ -370,12 +47,8 @@ renderInventario();
         <input type="text" id="searchInput" placeholder="Buscar producto...">
         <table id="inventarioTable"></table>
       </section>
-
-      <!-- Rutas -->
       <section id="rutasSection" class="hidden">
-        <header>
-          <h2>Rutas</h2>
-        </header>
+        <header><h2>Rutas</h2></header>
         <div class="form-section">
           <label>Selecciona Ruta:</label>
           <select id="rutaSelect"></select>
@@ -388,20 +61,12 @@ renderInventario();
         <div class="stats">Salidas por Ruta</div>
         <table id="rutasTable"></table>
       </section>
-
-      <!-- Ventas -->
       <section id="ventasSection" class="hidden">
-        <header>
-          <h2>Ventas</h2>
-        </header>
+        <header><h2>Ventas</h2></header>
         <table id="ventasTable"></table>
       </section>
-
-      <!-- Gestionar Inventario -->
       <section id="gestionarSection" class="hidden">
-        <header>
-          <h2>Gestionar Inventario</h2>
-        </header>
+        <header><h2>Gestionar Inventario</h2></header>
         <div class="form-section">
           <label>Acción:</label>
           <select id="gestionAccionSelect">
@@ -414,4 +79,180 @@ renderInventario();
       </section>
     </main>
   </div>
-  
+  <script>
+let productos = JSON.parse(localStorage.getItem("productos")) || [];
+let rutas = JSON.parse(localStorage.getItem("rutas")) || [{nombre:"Ruta 1", salidas:[]},{nombre:"Ruta 2", salidas:[]}];
+let ventas = JSON.parse(localStorage.getItem("ventas")) || [];
+
+function guardarEstado() {
+  localStorage.setItem("productos", JSON.stringify(productos));
+  localStorage.setItem("rutas", JSON.stringify(rutas));
+  localStorage.setItem("ventas", JSON.stringify(ventas));
+}
+
+document.querySelectorAll('.nav-link').forEach(link => {
+  link.addEventListener('click', () => {
+    document.querySelectorAll('.nav-link').forEach(l => l.classList.remove('active'));
+    link.classList.add('active');
+    document.querySelectorAll('main section').forEach(sec => sec.classList.add('hidden'));
+    document.getElementById(link.dataset.section + 'Section').classList.remove('hidden');
+    if(link.dataset.section==="inventario") renderInventario();
+    if(link.dataset.section==="rutas") renderRutas();
+    if(link.dataset.section==="ventas") renderVentas();
+    if(link.dataset.section==="gestionar") renderGestionar();
+  });
+});
+
+document.getElementById("searchInput").addEventListener("input", renderInventario);
+
+function renderInventario() {
+  const filtro = document.getElementById("searchInput").value.toLowerCase();
+  const filtrados = productos.filter(p => p.nombre.toLowerCase().includes(filtro));
+  document.getElementById("totalRefs").textContent = filtrados.length;
+  document.getElementById("totalCost").textContent = filtrados.reduce((sum, p) => sum + p.costo*p.cantidad, 0).toLocaleString();
+  const table = document.getElementById("inventarioTable");
+  table.innerHTML = `
+    <thead>
+      <tr>
+        <th>Producto</th><th>Costo</th><th>Precio</th><th>Cantidad</th><th>Ganancia</th><th>En Rutas</th>
+      </tr>
+    </thead>
+    <tbody>
+      ${filtrados.map(p => `
+        <tr>
+          <td>${p.nombre}</td>
+          <td>$${p.costo.toLocaleString()}</td>
+          <td>$${p.precio.toLocaleString()}</td>
+          <td>${p.cantidad}</td>
+          <td>$${p.ganancia.toLocaleString()}</td>
+          <td>${p.enRutas}</td>
+        </tr>`).join('')}
+    </tbody>`;
+}
+
+function renderRutas() {
+  const rutaSelect = document.getElementById("rutaSelect");
+  rutaSelect.innerHTML = rutas.map((r, i) => `<option value="${i}">${r.nombre}</option>`).join('');
+  const productoRutaSelect = document.getElementById("productoRutaSelect");
+  productoRutaSelect.innerHTML = productos.map((p, i) => `<option value="${i}">${p.nombre}</option>`).join('');
+  renderRutasTable();
+}
+
+function renderRutasTable() {
+  const rutasTable = document.getElementById("rutasTable");
+  rutasTable.innerHTML = `
+    <thead>
+      <tr><th>Ruta</th><th>Producto</th><th>Cantidad</th><th>Fecha</th></tr>
+    </thead>
+    <tbody>
+      ${rutas.flatMap(r => r.salidas.map(s => `
+        <tr>
+          <td>${r.nombre}</td>
+          <td>${s.producto}</td>
+          <td>${s.cantidad}</td>
+          <td>${s.fecha}</td>
+        </tr>`)).join('')}
+    </tbody>`;
+}
+
+document.getElementById("asignarRutaBtn").addEventListener("click", () => {
+  const rutaIndex = document.getElementById("rutaSelect").value;
+  const prodIndex = document.getElementById("productoRutaSelect").value;
+  const cantidad = parseInt(document.getElementById("cantidadRutaInput").value);
+  if (cantidad > 0 && productos[prodIndex].cantidad >= cantidad) {
+    productos[prodIndex].cantidad -= cantidad;
+    productos[prodIndex].enRutas += cantidad;
+    const fecha = new Date().toLocaleString();
+    rutas[rutaIndex].salidas.push({producto: productos[prodIndex].nombre, cantidad, fecha});
+    ventas.push({producto: productos[prodIndex].nombre, cantidad, fecha});
+    guardarEstado();
+    renderInventario(); renderRutas(); renderVentas();
+    document.getElementById("cantidadRutaInput").value = "";
+  } else {
+    alert("Cantidad inválida o stock insuficiente");
+  }
+});
+
+function renderVentas() {
+  const ventasTable = document.getElementById("ventasTable");
+  ventasTable.innerHTML = `
+    <thead>
+      <tr><th>Producto</th><th>Cantidad</th><th>Fecha</th></tr>
+    </thead>
+    <tbody>
+      ${ventas.map(v => `
+        <tr>
+          <td>${v.producto}</td>
+          <td>${v.cantidad}</td>
+          <td>${v.fecha}</td>
+        </tr>`).join('')}
+    </tbody>`;
+}
+
+document.getElementById("gestionAccionSelect").addEventListener("change", renderGestionar);
+
+function renderGestionar() {
+  const area = document.getElementById("gestionForm");
+  const accion = document.getElementById("gestionAccionSelect").value;
+  if (accion === "agregar") {
+    area.innerHTML = `
+      <div class="form-section">
+        <label>Nombre:</label><input id="nuevoNombre">
+        <label>Costo:</label><input type="number" id="nuevoCosto">
+        <label>Precio:</label><input type="number" id="nuevoPrecio">
+        <label>Cantidad:</label><input type="number" id="nuevaCantidad">
+        <label>Ganancia:</label><input type="number" id="nuevaGanancia">
+        <button id="guardarNuevoBtn">Agregar Producto</button>
+      </div>`;
+    document.getElementById("guardarNuevoBtn").addEventListener("click", () => {
+      productos.push({nombre:document.getElementById("nuevoNombre").value,costo:parseInt(document.getElementById("nuevoCosto").value),precio:parseInt(document.getElementById("nuevoPrecio").value),cantidad:parseInt(document.getElementById("nuevaCantidad").value),ganancia:parseInt(document.getElementById("nuevaGanancia").value),enRutas:0});
+      guardarEstado(); renderInventario(); alert("Producto agregado!");
+    });
+  } else if (accion === "eliminar") {
+    area.innerHTML = `
+      <div class="form-section">
+        <label>Selecciona producto a eliminar:</label>
+        <select id="eliminarSelect">
+          ${productos.map((p,i) => `<option value="${i}">${p.nombre}</option>`).join('')}
+        </select>
+        <button id="eliminarBtn">Eliminar</button>
+      </div>`;
+    document.getElementById("eliminarBtn").addEventListener("click", () => {
+      const index = document.getElementById("eliminarSelect").value;
+      productos.splice(index,1);
+      guardarEstado(); renderInventario(); renderGestionar(); alert("Producto eliminado!");
+    });
+  } else if (accion === "ver") {
+    area.innerHTML = `
+      <div class="stats">Haz clic en un campo para editar</div>
+      <table>
+        <thead>
+          <tr><th>Nombre</th><th>Costo</th><th>Precio</th><th>Cantidad</th><th>Ganancia</th></tr>
+        </thead>
+        <tbody>
+          ${productos.map((p,i) => `
+            <tr>
+              <td contenteditable="true" onblur="editarCampo(${i}, 'nombre', this.textContent)">${p.nombre}</td>
+              <td contenteditable="true" onblur="editarCampo(${i}, 'costo', this.textContent)">${p.costo}</td>
+              <td contenteditable="true" onblur="editarCampo(${i}, 'precio', this.textContent)">${p.precio}</td>
+              <td contenteditable="true" onblur="editarCampo(${i}, 'cantidad', this.textContent)">${p.cantidad}</td>
+              <td contenteditable="true" onblur="editarCampo(${i}, 'ganancia', this.textContent)">${p.ganancia}</td>
+            </tr>`).join('')}
+        </tbody>
+      </table>`;
+  }
+}
+
+function editarCampo(index, campo, valor) {
+  if (["costo","precio","cantidad","ganancia"].includes(campo)) {
+    productos[index][campo] = parseInt(valor) || 0;
+  } else {
+    productos[index][campo] = valor;
+  }
+  guardarEstado(); renderInventario();
+}
+
+renderInventario();
+</script>
+</body>
+</html>
