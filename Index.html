@@ -1,0 +1,246 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Prona Sur - Inventario</title>
+  <style>
+    body {
+      margin: 0;
+      font-family: Arial, sans-serif;
+      background-color: #f4f4f4;
+    }
+    .container {
+      display: flex;
+      min-height: 100vh;
+    }
+    aside {
+      width: 240px;
+      background-color: #2e7d32;
+      color: white;
+      padding: 20px;
+    }
+    aside h1 {
+      font-size: 24px;
+      margin-bottom: 30px;
+    }
+    aside nav a {
+      display: block;
+      color: white;
+      padding: 10px;
+      text-decoration: none;
+      border-radius: 4px;
+      margin-bottom: 8px;
+    }
+    aside nav a:hover {
+      background-color: #27642b;
+    }
+    main {
+      flex: 1;
+      padding: 20px;
+      background-color: #e8f5e9;
+    }
+    header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 20px;
+    }
+    header h2 {
+      margin: 0;
+      color: #1b5e20;
+    }
+    header button {
+      background-color: #66bb6a;
+      color: white;
+      border: none;
+      padding: 8px 16px;
+      margin-left: 8px;
+      border-radius: 4px;
+      cursor: pointer;
+    }
+    header button:hover {
+      background-color: #57a05b;
+    }
+    .top-bar {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 10px;
+    }
+    .top-bar input {
+      padding: 6px;
+      border-radius: 4px;
+      border: 1px solid #ccc;
+    }
+    .stats {
+      color: #1b5e20;
+      font-weight: bold;
+    }
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      background-color: white;
+    }
+    th, td {
+      border: 1px solid #ccc;
+      padding: 8px;
+      text-align: center;
+    }
+    th {
+      background-color: #c8e6c9;
+    }
+    tr:hover {
+      background-color: #f1f8e9;
+    }
+    .pagination {
+      margin-top: 10px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+    .pagination button {
+      padding: 6px 12px;
+      border-radius: 4px;
+      border: 1px solid #ccc;
+      background-color: #fff;
+      cursor: pointer;
+    }
+    .pagination button:disabled {
+      opacity: 0.5;
+      cursor: default;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <aside>
+      <h1>Prona Sur</h1>
+      <nav>
+        <a href="#">Inicio</a>
+        <a href="#">Rutas</a>
+        <a href="#">Ver Ventas</a>
+        <a href="#">Inventario</a>
+        <a href="#">Cerrar Sesión</a>
+      </nav>
+    </aside>
+    <main>
+      <header>
+        <h2>Inventario</h2>
+        <div>
+          <button>Categorías</button>
+          <button>Gestionar Inventario</button>
+        </div>
+      </header>
+      <div class="top-bar">
+        <div class="stats">
+          <span id="totalRefs">0</span> referencias | Costo total: $<span id="totalCost">0</span>
+        </div>
+        <input type="text" id="search" placeholder="Buscar productos...">
+      </div>
+      <table>
+        <thead>
+          <tr>
+            <th>Producto</th>
+            <th>Costo</th>
+            <th>Precio</th>
+            <th>Cantidad disponible</th>
+            <th>Ganancia</th>
+            <th>En Rutas</th>
+          </tr>
+        </thead>
+        <tbody id="tableBody"></tbody>
+      </table>
+      <div class="pagination">
+        <div>
+          Mostrar por página:
+          <select id="perPage">
+            <option value="5">5</option>
+            <option value="10">10</option>
+          </select>
+        </div>
+        <div>
+          Página <span id="currentPage">1</span> de <span id="totalPages">1</span>
+          <button id="prev">&lt;</button>
+          <button id="next">&gt;</button>
+        </div>
+      </div>
+    </main>
+  </div>
+  <script>
+    const data = [
+      { producto: "Arroz", costo: 1600, precio: 6000, cantidad: 1000, ganancia: 4500, enRutas: 0 },
+      { producto: "Frijoles", costo: 2500, precio: 3000, cantidad: 830, ganancia: 500, enRutas: 50 },
+      { producto: "Galletas", costo: 0, precio: 1.20, cantidad: 974, ganancia: 1.20, enRutas: -40 },
+      { producto: "PANELA X 250G", costo: 500, precio: 2000, cantidad: 910, ganancia: 1500, enRutas: -10 },
+      { producto: "GRANOLA FRUTOS SECOS X 4", costo: 1400, precio: 2300, cantidad: 512, ganancia: 900, enRutas: 0 },
+    ];
+
+    let search = "";
+    let page = 1;
+    let perPage = 5;
+
+    const tableBody = document.getElementById('tableBody');
+    const searchInput = document.getElementById('search');
+    const perPageSelect = document.getElementById('perPage');
+    const prevBtn = document.getElementById('prev');
+    const nextBtn = document.getElementById('next');
+    const currentPageSpan = document.getElementById('currentPage');
+    const totalPagesSpan = document.getElementById('totalPages');
+    const totalRefsSpan = document.getElementById('totalRefs');
+    const totalCostSpan = document.getElementById('totalCost');
+
+    function render() {
+      const filtered = data.filter(item => item.producto.toLowerCase().includes(search.toLowerCase()));
+      const totalPages = Math.ceil(filtered.length / perPage);
+      if (page > totalPages) page = totalPages || 1;
+
+      const start = (page - 1) * perPage;
+      const end = start + perPage;
+      const paginated = filtered.slice(start, end);
+
+      tableBody.innerHTML = paginated.map(item => `
+        <tr>
+          <td>${item.producto}</td>
+          <td>$${item.costo.toLocaleString()}</td>
+          <td>$${item.precio.toLocaleString()}</td>
+          <td>${item.cantidad}</td>
+          <td>$${item.ganancia.toLocaleString()}</td>
+          <td>${item.enRutas}</td>
+        </tr>
+      `).join('');
+
+      const costoTotal = filtered.reduce((sum, item) => sum + (item.costo * item.cantidad), 0);
+
+      currentPageSpan.textContent = page;
+      totalPagesSpan.textContent = totalPages || 1;
+      totalRefsSpan.textContent = filtered.length;
+      totalCostSpan.textContent = costoTotal.toLocaleString();
+
+      prevBtn.disabled = page <= 1;
+      nextBtn.disabled = page >= totalPages;
+    }
+
+    searchInput.addEventListener('input', e => {
+      search = e.target.value;
+      page = 1;
+      render();
+    });
+    perPageSelect.addEventListener('change', e => {
+      perPage = parseInt(e.target.value);
+      page = 1;
+      render();
+    });
+    prevBtn.addEventListener('click', () => {
+      if (page > 1) page--;
+      render();
+    });
+    nextBtn.addEventListener('click', () => {
+      page++;
+      render();
+    });
+
+    render();
+  </script>
+</body>
+</html>
