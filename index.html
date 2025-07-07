@@ -125,11 +125,11 @@
     <aside>
       <h1>Prona Sur</h1>
       <nav>
-        <a href="#">Inicio</a>
-        <a href="#">Rutas</a>
-        <a href="#">Ver Ventas</a>
-        <a href="#">Inventario</a>
-        <a href="#">Cerrar Sesión</a>
+        <a href="#" id="inventarioBtn">Inventario</a>
+        <a href="#" id="rutasBtn">Rutas</a>
+        <a href="#" id="ventasBtn">Ventas</a>
+        <a href="#" id="gestionarBtn">Gestionar Inventario</a>
+        <a href="#" id="cerrarSesionBtn">Cerrar Sesión</a>
       </nav>
     </aside>
     <main>
@@ -146,19 +146,7 @@
         </div>
         <input type="text" id="search" placeholder="Buscar productos...">
       </div>
-      <table>
-        <thead>
-          <tr>
-            <th>Producto</th>
-            <th>Costo</th>
-            <th>Precio</th>
-            <th>Cantidad disponible</th>
-            <th>Ganancia</th>
-            <th>En Rutas</th>
-          </tr>
-        </thead>
-        <tbody id="tableBody"></tbody>
-      </table>
+      <table id="tableBody"></table>
       <div class="pagination">
         <div>
           Mostrar por página:
@@ -176,7 +164,7 @@
     </main>
   </div>
   <script>
-    const data = [
+    const data = JSON.parse(localStorage.getItem("productos")) || [
       { producto: "Arroz", costo: 1600, precio: 6000, cantidad: 1000, ganancia: 4500, enRutas: 0 },
       { producto: "Frijoles", costo: 2500, precio: 3000, cantidad: 830, ganancia: 500, enRutas: 50 },
       { producto: "Galletas", costo: 0, precio: 1.20, cantidad: 974, ganancia: 1.20, enRutas: -40 },
@@ -207,16 +195,30 @@
       const end = start + perPage;
       const paginated = filtered.slice(start, end);
 
-      tableBody.innerHTML = paginated.map(item => `
-        <tr>
-          <td>${item.producto}</td>
-          <td>$${item.costo.toLocaleString()}</td>
-          <td>$${item.precio.toLocaleString()}</td>
-          <td>${item.cantidad}</td>
-          <td>$${item.ganancia.toLocaleString()}</td>
-          <td>${item.enRutas}</td>
-        </tr>
-      `).join('');
+      tableBody.innerHTML = `
+        <thead>
+          <tr>
+            <th>Producto</th>
+            <th>Costo</th>
+            <th>Precio</th>
+            <th>Cantidad disponible</th>
+            <th>Ganancia</th>
+            <th>En Rutas</th>
+          </tr>
+        </thead>
+        <tbody>
+          ${paginated.map(item => `
+            <tr>
+              <td>${item.producto}</td>
+              <td>$${item.costo.toLocaleString()}</td>
+              <td>$${item.precio.toLocaleString()}</td>
+              <td>${item.cantidad}</td>
+              <td>$${item.ganancia.toLocaleString()}</td>
+              <td>${item.enRutas}</td>
+            </tr>
+          `).join('')}
+        </tbody>
+      `;
 
       const costoTotal = filtered.reduce((sum, item) => sum + (item.costo * item.cantidad), 0);
 
