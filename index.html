@@ -15,14 +15,16 @@
       min-height: 100vh;
     }
     aside {
-      width: 240px;
+      width: 220px;
       background-color: #2e7d32;
       color: white;
       padding: 20px;
+      box-sizing: border-box;
     }
     aside h1 {
-      font-size: 24px;
+      font-size: 22px;
       margin-bottom: 30px;
+      text-align: center;
     }
     aside nav a {
       display: block;
@@ -39,6 +41,7 @@
       flex: 1;
       padding: 20px;
       background-color: #e8f5e9;
+      box-sizing: border-box;
     }
     header {
       display: flex;
@@ -66,16 +69,19 @@
       display: flex;
       justify-content: space-between;
       align-items: center;
-      margin-bottom: 10px;
+      margin-bottom: 12px;
+      flex-wrap: wrap;
     }
     .top-bar input {
       padding: 6px;
       border-radius: 4px;
       border: 1px solid #ccc;
+      width: 220px;
     }
     .stats {
       color: #1b5e20;
       font-weight: bold;
+      margin-bottom: 6px;
     }
     table {
       width: 100%;
@@ -94,17 +100,19 @@
       background-color: #f1f8e9;
     }
     .pagination {
-      margin-top: 10px;
+      margin-top: 12px;
       display: flex;
       justify-content: space-between;
       align-items: center;
+      flex-wrap: wrap;
     }
-    .pagination button {
-      padding: 6px 12px;
+    .pagination select, .pagination button {
+      padding: 6px 10px;
       border-radius: 4px;
       border: 1px solid #ccc;
       background-color: #fff;
       cursor: pointer;
+      margin-top: 6px;
     }
     .pagination button:disabled {
       opacity: 0.5;
@@ -192,8 +200,8 @@
 
     function render() {
       const filtered = data.filter(item => item.producto.toLowerCase().includes(search.toLowerCase()));
-      const totalPages = Math.ceil(filtered.length / perPage);
-      if (page > totalPages) page = totalPages || 1;
+      const totalPages = Math.ceil(filtered.length / perPage) || 1;
+      if (page > totalPages) page = totalPages;
 
       const start = (page - 1) * perPage;
       const end = start + perPage;
@@ -213,7 +221,7 @@
       const costoTotal = filtered.reduce((sum, item) => sum + (item.costo * item.cantidad), 0);
 
       currentPageSpan.textContent = page;
-      totalPagesSpan.textContent = totalPages || 1;
+      totalPagesSpan.textContent = totalPages;
       totalRefsSpan.textContent = filtered.length;
       totalCostSpan.textContent = costoTotal.toLocaleString();
 
