@@ -3,53 +3,58 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Prona Sur - Sistema de Inventario</title>
+  <title>Inventario Prona Sur</title>
   <style>
-    body { margin: 0; font-family: Arial, sans-serif; background-color: #f4f4f4;}
+    body { margin: 0; font-family: Arial, sans-serif; background-color: #ffffff; }
     .container { display: flex; min-height: 100vh; }
-    aside { width: 220px; background-color: #2e7d32; color: white; padding: 20px; box-sizing: border-box;}
-    aside h1 { font-size: 22px; margin-bottom: 30px; text-align: center; }
-    aside nav a { display: block; color: white; padding: 10px; text-decoration: none; border-radius: 4px; margin-bottom: 8px; cursor: pointer;}
+    aside { width: 220px; background-color: #2e7d32; color: white; padding: 20px; box-sizing: border-box; }
+    aside nav a { display: block; color: white; padding: 12px; text-decoration: none; border-radius: 4px; margin-bottom: 10px; }
     aside nav a:hover, aside nav a.active { background-color: #27642b; }
-    main { flex: 1; padding: 20px; background-color: #e8f5e9; box-sizing: border-box; overflow-y: auto;}
-    header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;}
-    header h2 { margin: 0; color: #1b5e20; }
-    button { background-color: #66bb6a; color: white; border: none; padding: 8px 16px; margin: 4px; border-radius: 4px; cursor: pointer;}
+    main { flex: 1; padding: 20px; background-color: #ffffff; box-sizing: border-box; }
+    header h2 { margin-top: 0; color: #2e7d32; }
+    button { background-color: #66bb6a; color: white; border: none; padding: 8px 16px; margin: 4px; border-radius: 4px; cursor: pointer; }
     button:hover { background-color: #57a05b; }
-    input, select { padding: 6px; border-radius: 4px; border: 1px solid #ccc; margin: 4px;}
-    table { width: 100%; border-collapse: collapse; background-color: white; margin-top: 10px;}
-    th, td { border: 1px solid #ccc; padding: 8px; text-align: center;}
-    th { background-color: #c8e6c9; }
+    input, select { padding: 6px; border-radius: 4px; border: 1px solid #ccc; margin: 4px; }
+    table { width: 100%; border-collapse: collapse; margin-top: 10px; background-color: white; }
+    th, td { border: 1px solid #ccc; padding: 8px; text-align: center; }
+    th { background-color: #a5d6a7; }
     .hidden { display: none; }
-    .form-section { background-color: white; padding: 10px; border-radius: 6px; margin-bottom: 10px;}
-    .stats { margin: 10px 0; font-weight: bold; color: #1b5e20; }
+    .toolbar { margin-bottom: 12px; }
+    @media (max-width: 768px) {
+      .container { flex-direction: column; }
+      aside { width: 100%; display: flex; overflow-x: auto; }
+      aside nav { display: flex; flex-wrap: wrap; }
+      aside nav a { flex: 1 1 auto; text-align: center; }
+    }
   </style>
 </head>
 <body>
   <div class="container">
     <aside>
-      <h1>Prona Sur</h1>
       <nav>
         <a class="nav-link active" data-section="inventario">Inventario</a>
         <a class="nav-link" data-section="rutas">Rutas</a>
         <a class="nav-link" data-section="ventas">Ventas</a>
-        <a class="nav-link" data-section="gestionar">Gestionar Inventario</a>
       </nav>
     </aside>
     <main>
       <section id="inventarioSection">
-        <header>
-          <h2>Inventario</h2>
-        </header>
-        <div class="stats">
-          <span id="totalRefs">0</span> referencias | Costo total: $<span id="totalCost">0</span>
+        <header><h2>Inventario</h2></header>
+        <div class="toolbar">
+          <button id="btnAgregar">➕ Agregar</button>
+          <button id="btnModificar">✏️ Modificar</button>
+          <button id="btnEliminar">🗑️ Eliminar</button>
         </div>
-        <input type="text" id="searchInput" placeholder="Buscar producto...">
+        <div id="inventarioForm"></div>
+        <div>
+          <input type="text" id="searchInput" placeholder="Buscar producto...">
+          <div>Total referencias: <span id="totalRefs">0</span> | Costo total: $<span id="totalCost">0</span></div>
+        </div>
         <table id="inventarioTable"></table>
       </section>
       <section id="rutasSection" class="hidden">
         <header><h2>Rutas</h2></header>
-        <div class="form-section">
+        <div>
           <label>Selecciona Ruta:</label>
           <select id="rutaSelect"></select>
           <label>Producto:</label>
@@ -58,30 +63,23 @@
           <input type="number" id="cantidadRutaInput" min="1">
           <button id="asignarRutaBtn">Asignar a Ruta</button>
         </div>
-        <div class="stats">Salidas por Ruta</div>
         <table id="rutasTable"></table>
       </section>
       <section id="ventasSection" class="hidden">
         <header><h2>Ventas</h2></header>
         <table id="ventasTable"></table>
       </section>
-      <section id="gestionarSection" class="hidden">
-        <header><h2>Gestionar Inventario</h2></header>
-        <div class="form-section">
-          <label>Acción:</label>
-          <select id="gestionAccionSelect">
-            <option value="agregar">Agregar Producto</option>
-            <option value="eliminar">Eliminar Producto</option>
-            <option value="ver">Ver / Editar Inventario</option>
-          </select>
-        </div>
-        <div id="gestionForm"></div>
-      </section>
     </main>
   </div>
   <script>
 let productos = JSON.parse(localStorage.getItem("productos")) || [];
-let rutas = JSON.parse(localStorage.getItem("rutas")) || [{nombre:"Ruta 1", salidas:[]},{nombre:"Ruta 2", salidas:[]}];
+let rutas = JSON.parse(localStorage.getItem("rutas")) || [
+  {nombre:"Ruta 1", salidas:[]},
+  {nombre:"Ruta 2", salidas:[]},
+  {nombre:"Ruta 3", salidas:[]},
+  {nombre:"Ruta 4", salidas:[]},
+  {nombre:"Ruta 5", salidas:[]}
+];
 let ventas = JSON.parse(localStorage.getItem("ventas")) || [];
 
 function guardarEstado() {
@@ -99,11 +97,99 @@ document.querySelectorAll('.nav-link').forEach(link => {
     if(link.dataset.section==="inventario") renderInventario();
     if(link.dataset.section==="rutas") renderRutas();
     if(link.dataset.section==="ventas") renderVentas();
-    if(link.dataset.section==="gestionar") renderGestionar();
   });
 });
 
 document.getElementById("searchInput").addEventListener("input", renderInventario);
+
+document.getElementById("btnAgregar").addEventListener("click", () => {
+  renderFormInventario('agregar');
+});
+document.getElementById("btnModificar").addEventListener("click", () => {
+  renderFormInventario('modificar');
+});
+document.getElementById("btnEliminar").addEventListener("click", () => {
+  renderFormInventario('eliminar');
+});
+
+function renderFormInventario(accion) {
+  const formDiv = document.getElementById("inventarioForm");
+  if (accion === "agregar") {
+    formDiv.innerHTML = `
+      <h3>Agregar Producto</h3>
+      <input placeholder="Nombre" id="nuevoNombre">
+      <input type="number" placeholder="Costo" id="nuevoCosto">
+      <input type="number" placeholder="Precio" id="nuevoPrecio">
+      <input type="number" placeholder="Cantidad" id="nuevaCantidad">
+      <input type="number" placeholder="Ganancia" id="nuevaGanancia">
+      <button id="guardarNuevoBtn">Guardar</button>`;
+    document.getElementById("guardarNuevoBtn").addEventListener("click", () => {
+      productos.push({
+        nombre: document.getElementById("nuevoNombre").value,
+        costo: parseInt(document.getElementById("nuevoCosto").value),
+        precio: parseInt(document.getElementById("nuevoPrecio").value),
+        cantidad: parseInt(document.getElementById("nuevaCantidad").value),
+        ganancia: parseInt(document.getElementById("nuevaGanancia").value),
+        enRutas: 0
+      });
+      guardarEstado();
+      formDiv.innerHTML = "";
+      renderInventario();
+      alert("Producto agregado!");
+    });
+  } else if (accion === "modificar") {
+    formDiv.innerHTML = `
+      <h3>Modificar Producto</h3>
+      <select id="modificarSelect">
+        ${productos.map((p,i) => `<option value="${i}">${p.nombre}</option>`).join('')}
+      </select>
+      <button id="editarBtn">Editar</button>`;
+    document.getElementById("editarBtn").addEventListener("click", () => {
+      const idx = document.getElementById("modificarSelect").value;
+      renderEditarProducto(idx);
+    });
+  } else if (accion === "eliminar") {
+    formDiv.innerHTML = `
+      <h3>Eliminar Producto</h3>
+      <select id="eliminarSelect">
+        ${productos.map((p,i) => `<option value="${i}">${p.nombre}</option>`).join('')}
+      </select>
+      <button id="eliminarBtn">Eliminar</button>`;
+    document.getElementById("eliminarBtn").addEventListener("click", () => {
+      const idx = document.getElementById("eliminarSelect").value;
+      if(confirm("¿Seguro de eliminar este producto?")) {
+        productos.splice(idx,1);
+        guardarEstado();
+        formDiv.innerHTML = "";
+        renderInventario();
+      }
+    });
+  }
+}
+
+function renderEditarProducto(idx) {
+  const p = productos[idx];
+  const formDiv = document.getElementById("inventarioForm");
+  formDiv.innerHTML = `
+    <h3>Editar Producto: ${p.nombre}</h3>
+    <input id="editNombre" value="${p.nombre}">
+    <input type="number" id="editCosto" value="${p.costo}">
+    <input type="number" id="editPrecio" value="${p.precio}">
+    <input type="number" id="editCantidad" value="${p.cantidad}">
+    <input type="number" id="editGanancia" value="${p.ganancia}">
+    <button id="guardarEditBtn">Guardar Cambios</button>`;
+  document.getElementById("guardarEditBtn").addEventListener("click", () => {
+    p.nombre = document.getElementById("editNombre").value;
+    p.costo = parseInt(document.getElementById("editCosto").value);
+    p.precio = parseInt(document.getElementById("editPrecio").value);
+    p.cantidad = parseInt(document.getElementById("editCantidad").value);
+    p.ganancia = parseInt(document.getElementById("editGanancia").value);
+    guardarEstado();
+    formDiv.innerHTML = "";
+    renderInventario();
+    alert("Producto modificado!");
+  });
+}
 
 function renderInventario() {
   const filtro = document.getElementById("searchInput").value.toLowerCase();
@@ -138,23 +224,6 @@ function renderRutas() {
   renderRutasTable();
 }
 
-function renderRutasTable() {
-  const rutasTable = document.getElementById("rutasTable");
-  rutasTable.innerHTML = `
-    <thead>
-      <tr><th>Ruta</th><th>Producto</th><th>Cantidad</th><th>Fecha</th></tr>
-    </thead>
-    <tbody>
-      ${rutas.flatMap(r => r.salidas.map(s => `
-        <tr>
-          <td>${r.nombre}</td>
-          <td>${s.producto}</td>
-          <td>${s.cantidad}</td>
-          <td>${s.fecha}</td>
-        </tr>`)).join('')}
-    </tbody>`;
-}
-
 document.getElementById("asignarRutaBtn").addEventListener("click", () => {
   const rutaIndex = document.getElementById("rutaSelect").value;
   const prodIndex = document.getElementById("productoRutaSelect").value;
@@ -173,6 +242,23 @@ document.getElementById("asignarRutaBtn").addEventListener("click", () => {
   }
 });
 
+function renderRutasTable() {
+  const rutasTable = document.getElementById("rutasTable");
+  rutasTable.innerHTML = `
+    <thead>
+      <tr><th>Ruta</th><th>Producto</th><th>Cantidad</th><th>Fecha</th></tr>
+    </thead>
+    <tbody>
+      ${rutas.flatMap(r => r.salidas.map(s => `
+        <tr>
+          <td>${r.nombre}</td>
+          <td>${s.producto}</td>
+          <td>${s.cantidad}</td>
+          <td>${s.fecha}</td>
+        </tr>`)).join('')}
+    </tbody>`;
+}
+
 function renderVentas() {
   const ventasTable = document.getElementById("ventasTable");
   ventasTable.innerHTML = `
@@ -189,70 +275,7 @@ function renderVentas() {
     </tbody>`;
 }
 
-document.getElementById("gestionAccionSelect").addEventListener("change", renderGestionar);
-
-function renderGestionar() {
-  const area = document.getElementById("gestionForm");
-  const accion = document.getElementById("gestionAccionSelect").value;
-  if (accion === "agregar") {
-    area.innerHTML = `
-      <div class="form-section">
-        <label>Nombre:</label><input id="nuevoNombre">
-        <label>Costo:</label><input type="number" id="nuevoCosto">
-        <label>Precio:</label><input type="number" id="nuevoPrecio">
-        <label>Cantidad:</label><input type="number" id="nuevaCantidad">
-        <label>Ganancia:</label><input type="number" id="nuevaGanancia">
-        <button id="guardarNuevoBtn">Agregar Producto</button>
-      </div>`;
-    document.getElementById("guardarNuevoBtn").addEventListener("click", () => {
-      productos.push({nombre:document.getElementById("nuevoNombre").value,costo:parseInt(document.getElementById("nuevoCosto").value),precio:parseInt(document.getElementById("nuevoPrecio").value),cantidad:parseInt(document.getElementById("nuevaCantidad").value),ganancia:parseInt(document.getElementById("nuevaGanancia").value),enRutas:0});
-      guardarEstado(); renderInventario(); alert("Producto agregado!");
-    });
-  } else if (accion === "eliminar") {
-    area.innerHTML = `
-      <div class="form-section">
-        <label>Selecciona producto a eliminar:</label>
-        <select id="eliminarSelect">
-          ${productos.map((p,i) => `<option value="${i}">${p.nombre}</option>`).join('')}
-        </select>
-        <button id="eliminarBtn">Eliminar</button>
-      </div>`;
-    document.getElementById("eliminarBtn").addEventListener("click", () => {
-      const index = document.getElementById("eliminarSelect").value;
-      productos.splice(index,1);
-      guardarEstado(); renderInventario(); renderGestionar(); alert("Producto eliminado!");
-    });
-  } else if (accion === "ver") {
-    area.innerHTML = `
-      <div class="stats">Haz clic en un campo para editar</div>
-      <table>
-        <thead>
-          <tr><th>Nombre</th><th>Costo</th><th>Precio</th><th>Cantidad</th><th>Ganancia</th></tr>
-        </thead>
-        <tbody>
-          ${productos.map((p,i) => `
-            <tr>
-              <td contenteditable="true" onblur="editarCampo(${i}, 'nombre', this.textContent)">${p.nombre}</td>
-              <td contenteditable="true" onblur="editarCampo(${i}, 'costo', this.textContent)">${p.costo}</td>
-              <td contenteditable="true" onblur="editarCampo(${i}, 'precio', this.textContent)">${p.precio}</td>
-              <td contenteditable="true" onblur="editarCampo(${i}, 'cantidad', this.textContent)">${p.cantidad}</td>
-              <td contenteditable="true" onblur="editarCampo(${i}, 'ganancia', this.textContent)">${p.ganancia}</td>
-            </tr>`).join('')}
-        </tbody>
-      </table>`;
-  }
-}
-
-function editarCampo(index, campo, valor) {
-  if (["costo","precio","cantidad","ganancia"].includes(campo)) {
-    productos[index][campo] = parseInt(valor) || 0;
-  } else {
-    productos[index][campo] = valor;
-  }
-  guardarEstado(); renderInventario();
-}
-
 renderInventario();
-</script>
+  </script>
 </body>
 </html>
