@@ -5,26 +5,26 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Latin Models</title>
   <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/Swiper/11.0.5/swiper-bundle.min.css" />
   <style>
     body {
       margin: 0;
       font-family: 'Cinzel', serif;
-      background: linear-gradient(to bottom, #000000, #1a1a1a);
-      color: #fff;
+      background: linear-gradient(to bottom, #ffffff, #ffeedd);
+      color: #222;
     }
 
     header {
-      background-color: #111;
-      padding: 50px 20px;
+      background: linear-gradient(135deg, #ffd700, #ffb347);
+      padding: 60px 20px;
       text-align: center;
-      border-bottom: 4px solid gold;
+      box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
     }
 
     header h1 {
-      font-size: 4.5em;
-      color: gold;
-      letter-spacing: 4px;
-      text-shadow: 0 0 20px gold;
+      font-size: 4em;
+      color: #222;
+      letter-spacing: 3px;
       margin: 0;
     }
 
@@ -33,104 +33,115 @@
       background: url('https://i.imgur.com/NcxwMvz.jpg') no-repeat center/cover;
       background-blend-mode: multiply;
       text-align: center;
+      color: #fff;
     }
 
     .hero p {
       max-width: 700px;
-      font-size: 1.7em;
+      font-size: 1.6em;
       margin: 0 auto;
       background-color: rgba(0,0,0,0.6);
       padding: 25px;
-      border: 2px solid gold;
-      border-radius: 15px;
+      border-radius: 12px;
     }
 
-    .galeria-modelo {
+    .swiper-container {
+      width: 100%;
+      padding: 50px 0;
+      background-color: #fff7ee;
+    }
+
+    .swiper-slide {
       text-align: center;
-      padding: 50px 20px;
-      background-color: #1a1a1a;
     }
 
-    .galeria-modelo h2 {
-      color: gold;
-      font-size: 2.5em;
-      margin-bottom: 20px;
-    }
-
-    .galeria-modelo img {
-      max-width: 90%;
-      height: auto;
-      border: 3px solid gold;
+    .swiper-slide img {
+      width: 85%;
+      max-height: 500px;
+      object-fit: cover;
       border-radius: 15px;
-      box-shadow: 0 0 30px rgba(255, 215, 0, 0.4);
+      box-shadow: 0 0 20px rgba(0,0,0,0.2);
       transition: transform 0.3s ease;
     }
 
-    .galeria-modelo img:hover {
-      transform: scale(1.05);
+    .swiper-slide img:hover {
+      transform: scale(1.03);
     }
 
-    .comparison-section {
-      display: grid;
-      grid-template-columns: 1fr 1fr;
-      gap: 20px;
+    .frases-virales {
       padding: 60px 20px;
-      background: #111;
-    }
-
-    .comparison-section div {
-      background: #1e1e1e;
-      padding: 20px;
-      border: 1px solid #333;
-      border-radius: 10px;
+      background: #222;
+      color: #ffd700;
       text-align: center;
     }
 
-    .comparison-section img {
-      width: 100%;
-      height: auto;
-      border: 2px solid gold;
-      border-radius: 5px;
+    .frases-virales blockquote {
+      font-size: 1.5em;
+      font-style: italic;
+      margin: 20px auto;
+      max-width: 700px;
+    }
+
+    .noticias-moda {
+      padding: 60px 20px;
+      background: #fff7ee;
+      text-align: center;
+    }
+
+    .noticias-moda h2 {
+      color: #ff7e5f;
+      margin-bottom: 30px;
+      font-size: 2.2em;
+    }
+
+    .noticias-moda .noticia {
+      margin-bottom: 25px;
+      font-size: 1.2em;
+    }
+
+    .noticias-moda .noticia h3 {
+      color: #333;
     }
 
     .casting-call {
-      background: linear-gradient(135deg, #000000, #4b007d);
+      background: linear-gradient(135deg, #ffecd2, #fcb69f);
       padding: 80px 20px;
       text-align: center;
     }
 
     .casting-call h2 {
-      font-size: 2.7em;
-      color: gold;
-      text-shadow: 0 0 10px #e100ff;
+      font-size: 2.5em;
+      color: #333;
     }
 
     .casting-call p {
-      font-size: 1.4em;
-      margin-bottom: 35px;
+      font-size: 1.2em;
+      margin-bottom: 30px;
+      max-width: 600px;
+      margin-left: auto;
+      margin-right: auto;
     }
 
     .casting-call a {
-      background: gold;
-      color: #000;
-      padding: 18px 35px;
-      font-size: 1.3em;
+      background: #ff7e5f;
+      color: #fff;
+      padding: 15px 30px;
+      font-size: 1.2em;
       text-decoration: none;
       border-radius: 30px;
-      box-shadow: 0 0 20px gold;
+      box-shadow: 0 0 15px rgba(255, 126, 95, 0.8);
       transition: 0.3s ease;
     }
 
     .casting-call a:hover {
-      background: #fff;
-      color: #4b007d;
+      background: #feb47b;
     }
 
     footer {
-      background: #000;
+      background: #222;
       padding: 20px;
       text-align: center;
-      color: #777;
+      color: #bbb;
       font-size: 0.9em;
     }
   </style>
@@ -142,40 +153,71 @@
   </header>
 
   <section class="hero">
-    <p>Descubre la nueva era del modelaje latino: lujo, futuro y excelencia en cada detalle. Únete a nosotros en esta transformación visual y estilística.</p>
+    <p>Descubre el universo Latin Models: un puente entre la elegancia clásica y la innovación digital. Nuestro casting ya está abierto.</p>
   </section>
 
-  <!-- BLOQUE DE IMAGEN DESTACADA -->
-  <section class="galeria-modelo">
-    <h2>Imagen destacada Latin Models</h2>
-    <img 
-      src="https://jomago98-prog.github.io/Latin-model/futuristic_gold_black.jpg" 
-      alt="Modelo futurista Latin Models"
-    >
-  </section>
-  <!-- FIN BLOQUE DE IMAGEN DESTACADA -->
-
-  <section class="comparison-section">
-    <div>
-      <h2>Moda Europea</h2>
-      <img src="https://i.imgur.com/Q0VtYHo.jpg" alt="Moda Europea" />
-      <p>Alta costura, legado, precisión y detalles clásicos con toque barroco.</p>
+  <!-- Carrusel de imágenes -->
+  <section class="swiper-container">
+    <div class="swiper-wrapper">
+      <div class="swiper-slide">
+        <img src="https://jomago98-prog.github.io/Latin-model/futuristic_gold_black.jpg" alt="Futuristic Gold" />
+      </div>
+      <div class="swiper-slide">
+        <img src="https://jomago98-prog.github.io/Latin-model/minimalist_high_couture.jpg" alt="Minimalist High Couture" />
+      </div>
     </div>
-    <div>
-      <h2>Moda Americana</h2>
-      <img src="https://i.imgur.com/psgE8ZT.jpg" alt="Moda Americana" />
-      <p>Rebeldía, modernidad, diversidad y tendencias digitales en constante evolución.</p>
+    <div class="swiper-pagination"></div>
+    <div class="swiper-button-prev"></div>
+    <div class="swiper-button-next"></div>
+  </section>
+
+  <!-- Frases virales -->
+  <section class="frases-virales">
+    <blockquote>“La elegancia es la única belleza que nunca desaparece.” – Audrey Hepburn</blockquote>
+    <blockquote>“El estilo es una manera de decir quién eres sin hablar.” – Rachel Zoe</blockquote>
+    <blockquote>“Latinoamérica no imita moda. La reinventa.” – Latin Models</blockquote>
+  </section>
+
+  <!-- Noticias de moda -->
+  <section class="noticias-moda">
+    <h2>Noticias de Moda</h2>
+
+    <div class="noticia">
+      <h3>🇫🇷 París Fashion Week rompe esquemas</h3>
+      <p>Diseñadores latinos debutan en la capital de la moda con propuestas inspiradas en raíces culturales y alta tecnología textil.</p>
+    </div>
+
+    <div class="noticia">
+      <h3>🇺🇸 NY se rinde ante lo latino</h3>
+      <p>Modelos colombianas y argentinas dominan las pasarelas neoyorquinas con estilos audaces, frescos y disruptivos.</p>
     </div>
   </section>
 
+  <!-- Llamado al casting -->
   <section class="casting-call">
     <h2>📸 ¡Casting Abierto!</h2>
-    <p>¿Listo para convertirte en el próximo ícono latino del modelaje? Este es tu momento viral. Regístrate ahora para el primer casting oficial.</p>
-    <a href="#registro">Unirme al casting</a>
+    <p>¿Quieres ser parte de la revolución del modelaje latino? Sé uno de los rostros que marcarán tendencia en la próxima década. Aplicar es fácil, rápido y gratuito.</p>
+    <a href="#registro">Aplicar al casting</a>
   </section>
 
   <footer>
     &copy; 2025 Latin Models. Todos los derechos reservados.
   </footer>
+
+  <!-- Scripts Swiper -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/Swiper/11.0.5/swiper-bundle.min.js"></script>
+  <script>
+    const swiper = new Swiper('.swiper-container', {
+      loop: true,
+      pagination: {
+        el: '.swiper-pagination',
+        clickable: true,
+      },
+      navigation: {
+        nextEl: '.swiper-button-next',
+        prevEl: '.swiper-button-prev',
+      },
+    });
+  </script>
 </body>
 </html>
