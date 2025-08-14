@@ -1,242 +1,401 @@
-<!DOCTYPE html>
-<html lang="es">
-<head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Latin Models</title>
-  <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@700&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/Swiper/11.0.5/swiper-bundle.min.css" />
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-  <style>
-    body {
-      margin: 0;
-      font-family: 'Cinzel', serif;
-      background: linear-gradient(to bottom, #f3e5f5, #ede7f6);
-      color: #4a0072;
+import React from 'react';
+import { motion } from 'framer-motion';
+import { Swiper, SwiperSlide } from 'swiper/react';
+import { Navigation, Pagination, Autoplay } from 'swiper/modules';
+import 'swiper/css';
+import 'swiper/css/navigation';
+import 'swiper/css/pagination';
+
+import Header from './components/Header';
+import Footer from './components/Footer';
+
+const App = () => {
+  const heroVideo = "https://assets.mixkit.co/videos/preview/mixkit-fashion-model-posing-in-a-studio-34434-large.mp4"; // Ejemplo de video
+  const carouselImages = [
+    "https://images.unsplash.com/photo-1581044777550-4cfa607037dc?q=80&w=2070&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D",
+    "https://images.unsplash.com/photo-1509910098196-f4316b1a6863?q=80&w=2070&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D",
+    "https://images.unsplash.com/photo-1515886657613-9f3515b0c206?q=80&w=2070&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D",
+    "https://images.unsplash.com/photo-1529139574466-a3769113b242?q=80&w=2070&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D"
+  ];
+
+  const viralQuotes = [
+    "La moda es arquitectura: es una cuestión de proporciones.",
+    "Vístete mal y recordarán el vestido; vístete impecable y recordarán a la mujer.",
+    "La elegancia no es una cualidad innata, es una conquista."
+  ];
+
+  const news = {
+    europe: [
+      { title: "París deslumbra con la Alta Costura de Primavera", date: "15 Ene, 2024", description: "Las pasarelas de París marcan el ritmo de las tendencias globales con diseños innovadores." },
+      { title: "Milán: La capital del cuero y la sastrería moderna", date: "10 Ene, 2024", description: "Milán reafirma su posición con colecciones que fusionan tradición y vanguardia." }
+    ],
+    latinAmerica: [
+      { title: "Bogotá Fashion Week: Nuevos talentos emergen", date: "20 Ene, 2024", description: "Diseñadores latinoamericanos presentan propuestas frescas y audaces." },
+      { title: "Sao Paulo Fashion: La diversidad en su máxima expresión", date: "18 Ene, 2024", description: "La moda brasileña celebra la inclusión y la riqueza cultural en sus colecciones." }
+    ]
+  };
+
+  const designers = [
+    {
+      name: "Sofía Vergara (Diseñadora)",
+      country: "Colombia",
+      image: "https://images.unsplash.com/photo-1524504388940-b1f1614a2878?q=80&w=1974&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D",
+      description: "Conocida por sus diseños audaces que fusionan la tradición artesanal con la vanguardia."
+    },
+    {
+      name: "Ricardo Tisci (Latino)",
+      country: "Argentina",
+      image: "https://images.unsplash.com/photo-1582719503527-c77232a60932?q=80&w=1974&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D",
+      description: "Maestro de la sastrería moderna y la elegancia oscura."
+    },
+    {
+      name: "Carolina Herrera (Latina)",
+      country: "Venezuela",
+      image: "https://images.unsplash.com/photo-1517841905240-472988babdf9?q=80&w=1974&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D",
+      description: "Ícono de la elegancia atemporal y la sofisticación."
     }
+  ];
 
-    * {
-      font-family: 'Cinzel', serif;
+  const collections = [
+    {
+      name: "Colección Éter",
+      designer: "Sofía Vergara (Diseñadora)",
+      year: 2023,
+      images: [
+        "https://4tsix0yujj.ufs.sh/f/2vMRHqOYUHc0OhCQmrwWwHMo3kKrdGO2gqByb0CvhnIYi8Px",
+        "https://4tsix0yujj.ufs.sh/f/2vMRHqOYUHc0ARHn9ErjBTv6ks7D2p0aEUqiwPFcNd9VLHQ8",
+        "https://images.unsplash.com/photo-1515886657613-9f3515b0c206?q=80&w=2070&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D",
+        "https://images.unsplash.com/photo-1529139574466-a3769113b242?q=80&w=2070&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D",
+        "https://images.unsplash.com/photo-1509910098196-f4316b1a6863?q=80&w=2070&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D",
+        "https://images.unsplash.com/photo-1515886657613-9f3515b0c206?q=80&w=2070&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D"
+      ],
+      description: "Una colección inspirada en la ligereza y la fluidez, con siluetas etéreas y detalles intrincados que capturan la esencia del movimiento y la gracia."
+    },
+    {
+      name: "Sombras Urbanas",
+      designer: "Ricardo Tisci (Latino)",
+      year: 2024,
+      images: [
+        "https://images.unsplash.com/photo-1582719503527-c77232a60932?q=80&w=1974&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D",
+        "https://images.unsplash.com/photo-1529139574466-a3769113b242?q=80&w=2070&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D",
+        "https://images.unsplash.com/photo-1517841905240-472988babdf9?q=80&w=1974&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D",
+        "https://images.unsplash.com/photo-1582719503527-c77232a60932?q=80&w=1974&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D",
+        "https://images.unsplash.com/photo-1529139574466-a3769113b242?q=80&w=2070&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D",
+        "https://images.unsplash.com/photo-1517841905240-472988babdf9?q=80&w=1974&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D"
+      ],
+      description: "Explorando la dualidad de la ciudad, esta colección presenta cortes limpios y una paleta de colores oscuros, reflejando la sofisticación de la vida urbana."
+    },
+    {
+      name: "Legado Dorado",
+      designer: "Carolina Herrera (Latina)",
+      year: 2023,
+      images: [
+        "https://images.unsplash.com/photo-1517841905240-472988babdf9?q=80&w=1974&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D",
+        "https://images.unsplash.com/photo-1581044777550-4cfa607037dc?q=80&w=2070&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D",
+        "https://images.unsplash.com/photo-1509910098196-f4316b1a6863?q=80&w=2070&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D",
+        "https://images.unsplash.com/photo-1515886657613-9f3515b0c206?q=80&w=2070&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D",
+        "https://images.unsplash.com/photo-1529139574466-a3769113b242?q=80&w=2070&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D",
+        "https://images.unsplash.com/photo-1517841905240-472988babdf9?q=80&w=1974&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D"
+      ],
+      description: "Una oda a la elegancia clásica, con toques modernos y una paleta de colores que evoca el lujo y la sofisticación."
     }
+  ];
 
-    header {
-      background-color: #6a0dad;
-      padding: 60px 20px;
-      text-align: center;
-      box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
-    }
+  return (
+    <div className="min-h-screen bg-black text-white-elegant">
+      <Header />
 
-    header h1 {
-      font-size: 4em;
-      color: #fff;
-      letter-spacing: 3px;
-      margin: 0;
-    }
+      {/* Hero Section */}
+      <section className="relative h-screen flex items-center justify-center overflow-hidden">
+        <video
+          className="absolute top-0 left-0 w-full h-full object-cover z-0 opacity-70"
+          src={heroVideo}
+          autoPlay
+          loop
+          muted
+          playsInline
+        ></video>
+        <div className="absolute top-0 left-0 w-full h-full bg-gradient-to-t from-black via-transparent to-black z-10"></div>
+        <motion.div
+          className="relative z-20 text-center p-8"
+          initial={{ opacity: 0, y: 50 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 1, delay: 0.5 }}
+        >
+          <h2 className="text-6xl md:text-8xl font-bold text-golden-soft mb-4 leading-tight">
+            Latin Models
+          </h2>
+          <p className="text-xl md:text-2xl text-white-elegant max-w-3xl mx-auto">
+            Donde la elegancia latina se encuentra con el futuro de la moda global.
+          </p>
+        </motion.div>
+      </section>
 
-    .hero {
-      padding: 80px 20px;
-      background: url('https://i.imgur.com/NcxwMvz.jpg') no-repeat center/cover;
-      background-blend-mode: multiply;
-      text-align: center;
-      color: #fff;
-    }
+      {/* Carousel Section */}
+      <section className="py-20 px-8 bg-gradient-to-b from-black to-purple-dominant/20">
+        <div className="container mx-auto">
+          <motion.h2
+            className="text-5xl font-bold text-center text-golden-soft mb-16"
+            initial={{ opacity: 0, y: -20 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true, amount: 0.5 }}
+            transition={{ duration: 0.8 }}
+          >
+            Nuestras Campañas
+          </motion.h2>
+          <motion.div
+            initial={{ opacity: 0, scale: 0.9 }}
+            whileInView={{ opacity: 1, scale: 1 }}
+            viewport={{ once: true, amount: 0.3 }}
+            transition={{ duration: 0.8, delay: 0.2 }}
+            className="rounded-3xl overflow-hidden shadow-2xl border border-purple-dominant/50"
+          >
+            <Swiper
+              modules={[Navigation, Pagination, Autoplay]}
+              spaceBetween={30}
+              slidesPerView={1}
+              navigation
+              pagination={{ clickable: true }}
+              autoplay={{ delay: 4000, disableOnInteraction: false }}
+              loop={true}
+              className="w-full h-[600px]"
+            >
+              {carouselImages.map((src, index) => (
+                <SwiperSlide key={index}>
+                  <img
+                    src={src}
+                    alt={`Campaña ${index + 1}`}
+                    className="w-full h-full object-cover"
+                  />
+                </SwiperSlide>
+              ))}
+            </Swiper>
+          </motion.div>
+        </div>
+      </section>
 
-    .hero p {
-      max-width: 700px;
-      font-size: 1.6em;
-      margin: 0 auto;
-      background-color: rgba(0,0,0,0.6);
-      padding: 25px;
-      border-radius: 12px;
-    }
+      {/* Viral Quotes Section */}
+      <section className="py-20 px-8 bg-purple-dominant/30">
+        <div className="container mx-auto">
+          <motion.div
+            className="text-center"
+            initial={{ opacity: 0, y: 50 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true, amount: 0.5 }}
+            transition={{ duration: 0.8 }}
+          >
+            {viralQuotes.map((quote, index) => (
+              <motion.p
+                key={index}
+                className="text-4xl md:text-6xl font-bold text-white-elegant mb-8 italic leading-snug"
+                initial={{ opacity: 0, y: 20 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                viewport={{ once: true, amount: 0.5 }}
+                transition={{ duration: 0.8, delay: 0.2 * index }}
+              >
+                "{quote}"
+              </motion.p>
+            ))}
+          </motion.div>
+        </div>
+      </section>
 
-    .swiper-container {
-      width: 100%;
-      padding: 50px 0;
-      background-color: #f8eafa;
-    }
+      {/* Designers Section */}
+      <section className="py-20 px-8 bg-black">
+        <div className="container mx-auto">
+          <motion.h2
+            className="text-5xl font-bold text-center text-golden-soft mb-16"
+            initial={{ opacity: 0, y: -20 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true, amount: 0.5 }}
+            transition={{ duration: 0.8 }}
+          >
+            Diseñadores Destacados
+          </motion.h2>
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-12">
+            {designers.map((designer, index) => (
+              <motion.div
+                key={index}
+                className="bg-purple-dominant/10 p-8 rounded-3xl shadow-xl border border-purple-dominant/30 flex flex-col items-center text-center"
+                initial={{ opacity: 0, y: 50 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                viewport={{ once: true, amount: 0.3 }}
+                transition={{ duration: 0.8, delay: 0.1 * index }}
+              >
+                <img
+                  src={designer.image}
+                  alt={designer.name}
+                  className="w-48 h-48 object-cover rounded-full mb-6 border-4 border-golden-soft shadow-lg"
+                />
+                <h3 className="text-3xl font-bold text-white-elegant mb-2">{designer.name}</h3>
+                <p className="text-lg text-golden-soft mb-4">{designer.country}</p>
+                <p className="text-gray-300 text-base">{designer.description}</p>
+              </motion.div>
+            ))}
+          </div>
+        </div>
+      </section>
 
-    .swiper-slide {
-      text-align: center;
-    }
+      {/* Collections Section */}
+      <section className="py-20 px-8 bg-gradient-to-b from-black to-purple-dominant/20">
+        <div className="container mx-auto">
+          <motion.h2
+            className="text-5xl font-bold text-center text-golden-soft mb-16"
+            initial={{ opacity: 0, y: -20 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true, amount: 0.5 }}
+            transition={{ duration: 0.8 }}
+          >
+            Nuestras Colecciones
+          </motion.h2>
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-12">
+            {collections.map((collection, index) => (
+              <motion.div
+                key={index}
+                className="bg-purple-dominant/10 p-8 rounded-3xl shadow-xl border border-purple-dominant/30"
+                initial={{ opacity: 0, y: 50 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                viewport={{ once: true, amount: 0.3 }}
+                transition={{ duration: 0.8, delay: 0.1 * index }}
+              >
+                <h3 className="text-3xl font-bold text-white-elegant mb-4">{collection.name} ({collection.year})</h3>
+                <p className="text-lg text-golden-soft mb-4">Diseñador: {collection.designer}</p>
+                <p className="text-gray-300 mb-6">{collection.description}</p>
+                <div className="grid grid-cols-2 sm:grid-cols-3 gap-4"> {/* Adjusted grid for more images */}
+                  {collection.images.map((imgSrc, imgIndex) => (
+                    <motion.img
+                      key={imgIndex}
+                      src={imgSrc}
+                      alt={`${collection.name} - Imagen ${imgIndex + 1}`}
+                      className="w-full h-48 object-cover rounded-xl shadow-md"
+                      whileHover={{ scale: 1.05 }}
+                      transition={{ duration: 0.3 }}
+                    />
+                  ))}
+                </div>
+              </motion.div>
+            ))}
+          </div>
+        </div>
+      </section>
 
-    .swiper-slide img {
-      width: 85%;
-      max-height: 500px;
-      object-fit: cover;
-      border-radius: 15px;
-      box-shadow: 0 0 20px rgba(0,0,0,0.2);
-      transition: transform 0.3s ease;
-    }
+      {/* News Section */}
+      <section className="py-20 px-8 bg-black">
+        <div className="container mx-auto">
+          <motion.h2
+            className="text-5xl font-bold text-center text-golden-soft mb-16"
+            initial={{ opacity: 0, y: -20 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true, amount: 0.5 }}
+            transition={{ duration: 0.8 }}
+          >
+            Noticias de Moda
+          </motion.h2>
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-12">
+            {/* Europe News */}
+            <motion.div
+              className="bg-purple-dominant/10 p-10 rounded-3xl shadow-xl border border-purple-dominant/30"
+              initial={{ opacity: 0, x: -50 }}
+              whileInView={{ opacity: 1, x: 0 }}
+              viewport={{ once: true, amount: 0.3 }}
+              transition={{ duration: 0.8 }}
+            >
+              <h3 className="text-3xl font-bold text-golden-soft mb-8 border-b border-golden-soft pb-4">
+                Europa
+              </h3>
+              <div className="space-y-8">
+                {news.europe.map((item, index) => (
+                  <motion.div
+                    key={index}
+                    className="pb-6 border-b border-gray-700 last:border-b-0"
+                    initial={{ opacity: 0, y: 20 }}
+                    whileInView={{ opacity: 1, y: 0 }}
+                    viewport={{ once: true, amount: 0.5 }}
+                    transition={{ duration: 0.6, delay: 0.2 * index }}
+                  >
+                    <h4 className="text-2xl font-semibold text-white-elegant mb-2">{item.title}</h4>
+                    <p className="text-sm text-gray-400 mb-2">{item.date}</p>
+                    <p className="text-gray-300">{item.description}</p>
+                  </motion.div>
+                ))}
+              </div>
+            </motion.div>
 
-    .swiper-slide img:hover {
-      transform: scale(1.03);
-    }
+            {/* Latin America News */}
+            <motion.div
+              className="bg-purple-dominant/10 p-10 rounded-3xl shadow-xl border border-purple-dominant/30"
+              initial={{ opacity: 0, x: 50 }}
+              whileInView={{ opacity: 1, x: 0 }}
+              viewport={{ once: true, amount: 0.3 }}
+              transition={{ duration: 0.8 }}
+            >
+              <h3 className="text-3xl font-bold text-golden-soft mb-8 border-b border-golden-soft pb-4">
+                América Latina
+              </h3>
+              <div className="space-y-8">
+                {news.latinAmerica.map((item, index) => (
+                  <motion.div
+                    key={index}
+                    className="pb-6 border-b border-gray-700 last:border-b-0"
+                    initial={{ opacity: 0, y: 20 }}
+                    whileInView={{ opacity: 1, y: 0 }}
+                    viewport={{ once: true, amount: 0.5 }}
+                    transition={{ duration: 0.6, delay: 0.2 * index }}
+                  >
+                    <h4 className="text-2xl font-semibold text-white-elegant mb-2">{item.title}</h4>
+                    <p className="text-sm text-gray-400 mb-2">{item.date}</p>
+                    <p className="text-gray-300">{item.description}</p>
+                  </motion.div>
+                ))}
+              </div>
+            </motion.div>
+          </div>
+        </div>
+      </section>
 
-    .frases-virales {
-      padding: 60px 20px;
-      background: #4a0072;
-      color: #fff59d;
-      text-align: center;
-    }
+      {/* Casting CTA Section */}
+      <section className="py-20 px-8 bg-gradient-to-r from-purple-dominant to-violet-dark text-center">
+        <div className="container mx-auto">
+          <motion.h2
+            className="text-5xl font-bold text-white-elegant mb-8"
+            initial={{ opacity: 0, y: -20 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true, amount: 0.5 }}
+            transition={{ duration: 0.8 }}
+          >
+            ¿Tienes lo que se necesita?
+          </motion.h2>
+          <motion.p
+            className="text-xl text-white-elegant mb-12 max-w-2xl mx-auto"
+            initial={{ opacity: 0, y: -20 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true, amount: 0.5 }}
+            transition={{ duration: 0.8, delay: 0.2 }}
+          >
+            Únete a la próxima generación de íconos de la moda. Tu futuro comienza aquí.
+          </motion.p>
+          <motion.button
+            className="bg-golden-soft text-black text-2xl font-bold py-5 px-12 rounded-full shadow-lg hover:shadow-xl transition-all duration-300 transform hover:scale-105"
+            whileHover={{ scale: 1.05, boxShadow: "0 0 20px rgba(212, 175, 55, 0.8)" }}
+            whileTap={{ scale: 0.95 }}
+            animate={{
+              scale: [1, 1.02, 1],
+              boxShadow: ["0 0 0px rgba(212, 175, 55, 0)", "0 0 15px rgba(212, 175, 55, 0.6)", "0 0 0px rgba(212, 175, 55, 0)"]
+            }}
+            transition={{
+              duration: 2,
+              repeat: Infinity,
+              ease: "easeInOut"
+            }}
+          >
+            Aplicar al Casting
+          </motion.button>
+        </div>
+      </section>
 
-    .frases-virales blockquote {
-      font-size: 1.5em;
-      font-style: italic;
-      margin: 20px auto;
-      max-width: 700px;
-    }
-
-    .noticias-moda {
-      padding: 60px 20px;
-      background: #f3e5f5;
-      text-align: center;
-    }
-
-    .noticias-moda h2 {
-      color: #6a0dad;
-      margin-bottom: 30px;
-      font-size: 2.2em;
-    }
-
-    .noticias-moda .noticia {
-      margin-bottom: 25px;
-      font-size: 1.2em;
-    }
-
-    .noticias-moda .noticia h3 {
-      color: #4a0072;
-    }
-
-    .casting-call {
-      background: linear-gradient(135deg, #ce93d8, #ba68c8);
-      padding: 80px 20px;
-      text-align: center;
-    }
-
-    .casting-call h2 {
-      font-size: 2.5em;
-      color: #fff;
-    }
-
-    .casting-call p {
-      font-size: 1.2em;
-      margin-bottom: 30px;
-      max-width: 600px;
-      margin-left: auto;
-      margin-right: auto;
-      color: #f3e5f5;
-    }
-
-    .casting-call a {
-      background: #6a0dad;
-      color: #fff;
-      padding: 15px 30px;
-      font-size: 1.2em;
-      text-decoration: none;
-      border-radius: 30px;
-      box-shadow: 0 0 15px rgba(106, 13, 173, 0.8);
-      transition: 0.3s ease;
-    }
-
-    .casting-call a:hover {
-      background: #4a0072;
-    }
-
-    footer {
-      background: #4a0072;
-      padding: 20px;
-      text-align: center;
-      color: #fff;
-      font-size: 0.9em;
-    }
-
-    .social-icons {
-      margin-top: 15px;
-    }
-
-    .social-icons a {
-      color: #fff;
-      margin: 0 10px;
-      font-size: 1.5em;
-      text-decoration: none;
-      transition: color 0.3s ease;
-    }
-
-    .social-icons a:hover {
-      color: #ffd700;
-    }
-  </style>
-</head>
-<body>
-  <header>
-    <h1>Latin Models</h1>
-  </header>
-
-  <section class="hero">
-    <p>Descubre el universo Latin Models: un puente entre la elegancia clásica y la innovación digital. Nuestro casting ya está abierto.</p>
-  </section>
-
-  <section class="swiper-container">
-    <div class="swiper-wrapper">
-      <div class="swiper-slide">
-        <img src="https://jomago98-prog.github.io/Latin-model/futuristic_gold_black.jpg" alt="Futuristic Gold" />
-      </div>
-      <div class="swiper-slide">
-        <img src="https://jomago98-prog.github.io/Latin-model/minimalist_high_couture.jpg" alt="Minimalist High Couture" />
-      </div>
+      <Footer />
     </div>
-    <div class="swiper-pagination"></div>
-    <div class="swiper-button-prev"></div>
-    <div class="swiper-button-next"></div>
-  </section>
+  );
+};
 
-  <section class="frases-virales">
-    <blockquote>“La elegancia es la única belleza que nunca desaparece.” – Audrey Hepburn</blockquote>
-    <blockquote>“El estilo es una manera de decir quién eres sin hablar.” – Rachel Zoe</blockquote>
-    <blockquote>“Latinoamérica no imita moda. La reinventa.” – Latin Models</blockquote>
-  </section>
-
-  <section class="noticias-moda">
-    <h2>Noticias de Moda</h2>
-    <div class="noticia">
-      <h3>🇫🇷 París Fashion Week rompe esquemas</h3>
-      <p>Diseñadores latinos debutan en la capital de la moda con propuestas inspiradas en raíces culturales y alta tecnología textil.</p>
-    </div>
-    <div class="noticia">
-      <h3>🇺🇸 NY se rinde ante lo latino</h3>
-      <p>Modelos colombianas y argentinas dominan las pasarelas neoyorquinas con estilos audaces, frescos y disruptivos.</p>
-    </div>
-  </section>
-
-  <section class="casting-call">
-    <h2> ¡Casting Abierto!</h2>
-    <p>¿Quieres ser parte de la revolución del modelaje latino? Sé uno de los rostros que marcarán tendencia en la próxima década. Aplicar es fácil, rápido y gratuito.</p>
-    <a href="#registro">Aplicar al casting</a>
-  </section>
-
-  <footer>
-    &copy; 2025 Latin Models. Todos los derechos reservados.
-    <div class="social-icons">
-      <a href="https://instagram.com" target="_blank"><i class="fab fa-instagram"></i></a>
-      <a href="https://facebook.com" target="_blank"><i class="fab fa-facebook"></i></a>
-      <a href="https://tiktok.com" target="_blank"><i class="fab fa-tiktok"></i></a>
-    </div>
-  </footer>
-
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/Swiper/11.0.5/swiper-bundle.min.js"></script>
-  <script>
-    const swiper = new Swiper('.swiper-container', {
-      loop: true,
-      pagination: {
-        el: '.swiper-pagination',
-        clickable: true,
-      },
-      navigation: {
-        nextEl: '.swiper-button-next',
-        prevEl: '.swiper-button-prev',
-      },
-    });
-  </script>
-</body>
-</html>
+export default App;
